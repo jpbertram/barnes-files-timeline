@@ -1,0 +1,42 @@
+<!--
+  SQUARESPACE EMBED SNIPPET
+  
+  Paste this into a Code Block in your Squarespace blog post.
+  Replace YOUR_GITHUB_USERNAME with your actual GitHub username.
+  
+  The repo must be published to GitHub Pages first:
+  1. Push this repo to GitHub
+  2. Go to repo Settings > Pages > Source: Deploy from a branch > main / root
+  3. Wait ~60 seconds for it to go live
+  4. Your URL will be: https://YOUR_GITHUB_USERNAME.github.io/barnes-files-timeline/
+-->
+
+<!-- Hide Squarespace native post H1 -->
+<style>
+h1.entry-title,h1.BlogItem-title,h1.page-title{display:none !important}
+</style>
+
+<!-- Timeline iframe - replace YOUR_GITHUB_USERNAME -->
+<div style="width:100%;max-width:100%;margin:0 auto;position:relative;">
+  <iframe 
+    src="https://YOUR_GITHUB_USERNAME.github.io/barnes-files-timeline/"
+    style="width:100%;border:none;min-height:100vh;display:block;"
+    id="barnes-timeline"
+    loading="eager"
+    allow="fullscreen"
+  ></iframe>
+</div>
+
+<!-- Auto-resize iframe to content height -->
+<script>
+(function(){
+  var iframe = document.getElementById('barnes-timeline');
+  window.addEventListener('message', function(e){
+    if(e.data && e.data.type === 'resize'){
+      iframe.style.height = e.data.height + 'px';
+    }
+  });
+  // Fallback: set generous height
+  iframe.style.height = '12000px';
+})();
+</script>

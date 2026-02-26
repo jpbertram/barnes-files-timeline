@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>The Barnes Files | Belligerent Beavs</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&family=Barlow+Condensed:wght@400;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* Hide Squarespace native blog post H1 only */
+h1.entry-title,h1.BlogItem-title,h1.page-title{display:none !important}
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --black:#0a0a0a;
+  --dark:#111;
+  --dark2:#1a1a1a;
+  --dark3:#222;
+  --orange:#dc4405;
+  --orange-glow:#ff5a1a;
+  --white:#f5f5f5;
+  --gray:#999;
+  --gray-dim:#555;
+  --gray-line:#333;
+  --red:#ff3333;
+  --green:#22c55e;
+  --font-display:'Bebas Neue',sans-serif;
+  --font-body:'Barlow',sans-serif;
+  --font-condensed:'Barlow Condensed',sans-serif;
+  --font-mono:'IBM Plex Mono',monospace;
+}
+html{scroll-behavior:smooth}
+body{
+  background:var(--black);color:var(--white);
+  font-family:var(--font-body);font-size:17px;line-height:1.7;
+  overflow-x:hidden;-webkit-font-smoothing:antialiased;
+}
+
+/* PROGRESS */
+.progress-bar{position:fixed;top:0;left:0;height:3px;background:var(--orange);z-index:1000;width:0%;transition:width .1s linear;}
+
+/* HERO */
+.hero{
+  min-height:100svh;display:flex;flex-direction:column;
+  justify-content:center;align-items:center;text-align:center;
+  padding:40px 20px;position:relative;overflow:hidden;
+}
+.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% 80%,rgba(220,68,5,.08) 0%,transparent 60%);pointer-events:none;}
+.hero-kicker{font-family:var(--font-mono);font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--orange);margin-bottom:20px;opacity:0;animation:fadeUp .8s .2s forwards;}
+.hero h1{font-family:var(--font-display);font-size:clamp(56px,12vw,120px);line-height:.9;letter-spacing:2px;color:var(--white) !important;opacity:0;animation:fadeUp .8s .4s forwards;}
+.hero h1 span{color:var(--orange) !important;}
+.hero-sub{font-family:var(--font-condensed);font-size:clamp(18px,3.5vw,26px);font-weight:400;color:var(--gray);max-width:640px;margin:24px auto 0;line-height:1.5;opacity:0;animation:fadeUp .8s .6s forwards;}
+.hero-meta{font-family:var(--font-mono);font-size:12px;color:var(--gray-dim);margin-top:32px;opacity:0;animation:fadeUp .8s .8s forwards;}
+.hero-scroll{
+  position:absolute;bottom:32px;
+  left:0;right:0;
+  display:flex;flex-direction:column;align-items:center;gap:8px;
+  font-family:var(--font-mono);font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--gray-dim);
+  opacity:0;animation:fadeUp .8s 1.2s forwards;
+}
+.hero-scroll .arrow{width:20px;height:20px;border-right:2px solid var(--gray-dim);border-bottom:2px solid var(--gray-dim);transform:rotate(45deg);animation:bounce 2s infinite;}
+
+/* INTRO */
+.intro{max-width:680px;margin:0 auto;padding:80px 20px;}
+.intro p{margin-bottom:20px;color:#ccc;}
+.intro .read-all{display:inline-block;margin-top:8px;padding:12px 0;font-family:var(--font-condensed);font-size:22px;font-weight:700;color:var(--orange);border-bottom:2px solid var(--orange);letter-spacing:1px;text-transform:uppercase;}
+
+/* HOSTING NOTE */
+.hosting-note{max-width:680px;margin:0 auto 40px;padding:16px 20px;background:rgba(220,68,5,.06);border:1px solid rgba(220,68,5,.15);border-radius:8px;font-size:14px;color:var(--gray);text-align:center;}
+.hosting-note a{color:var(--orange);text-decoration:underline;}
+
+/* TIMELINE */
+.timeline{position:relative;padding:0 20px 40px;max-width:800px;margin:0 auto;}
+.timeline::before{content:'';position:absolute;left:28px;top:0;bottom:0;width:2px;background:linear-gradient(to bottom,transparent,var(--gray-line) 3%,var(--gray-line) 97%,transparent);}
+
+/* TIMELINE ENTRY */
+.t-entry{
+  position:relative;padding-left:56px;
+  margin-bottom:36px;
+  opacity:0;transform:translateY(30px);
+  transition:all .5s cubic-bezier(.25,.46,.45,.94);
+}
+.t-entry.visible{opacity:1;transform:translateY(0);}
+
+/* MINOR entries (context, no record card) */
+.t-entry.minor{margin-bottom:28px;}
+.t-entry.minor .t-title{font-size:clamp(20px,4vw,26px);}
+
+.t-dot{
+  position:absolute;left:20px;top:6px;
+  width:18px;height:18px;border-radius:50%;
+  background:var(--dark);border:2px solid var(--orange);
+  z-index:2;transition:all .4s;
+}
+.t-entry.visible .t-dot{
+  background:var(--orange);
+  box-shadow:0 0 8px rgba(220,68,5,.6),0 0 20px rgba(220,68,5,.3);
+}
+.t-entry.minor .t-dot{width:12px;height:12px;left:23px;top:8px;}
+.t-entry.minor.visible .t-dot{box-shadow:0 0 6px rgba(220,68,5,.4);}
+
+.t-date{font-family:var(--font-mono);font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--orange);margin-bottom:4px;}
+.t-title{font-family:var(--font-display);font-size:clamp(26px,5vw,36px);line-height:1;letter-spacing:1px;margin-bottom:10px;}
+.t-body{color:#bbb;margin-bottom:12px;font-size:16px;}
+.t-body strong{color:var(--white);font-weight:600;}
+
+/* RECORD CARD */
+.record{background:var(--dark2);border:1px solid var(--gray-line);border-left:3px solid var(--orange);border-radius:6px;overflow:hidden;margin:16px 0;text-align:left;}
+.record-head{padding:10px 14px;background:var(--dark3);border-bottom:1px solid var(--gray-line);display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-family:var(--font-mono);font-size:11px;color:var(--gray);}
+.record-tag{background:rgba(220,68,5,.15);color:var(--orange);padding:2px 8px;border-radius:3px;font-weight:500;font-size:10px;letter-spacing:1px;text-transform:uppercase;}
+.record-body{padding:14px;font-size:15px;line-height:1.7;color:#ccc;}
+.record-body strong{color:var(--orange-glow);font-weight:700;}
+.record-link{display:inline-block;margin:4px 14px 10px;font-family:var(--font-mono);font-size:11px;color:var(--orange);text-decoration:none;letter-spacing:1px;}
+.record-link:hover{text-decoration:underline;}
+
+/* MONEY */
+.money-compare{margin:20px 0;display:flex;flex-direction:column;gap:10px;}
+.money-box{padding:16px;border-radius:8px;text-align:center;font-family:var(--font-condensed);}
+.money-box.good{background:rgba(34,197,94,.08);border:1px solid rgba(34,197,94,.3);}
+.money-box.bad{background:rgba(255,51,51,.08);border:1px solid rgba(255,51,51,.3);}
+.money-label{font-size:12px;letter-spacing:2px;text-transform:uppercase;font-family:var(--font-mono);margin-bottom:6px;}
+.money-box.good .money-label{color:var(--green);}
+.money-box.bad .money-label{color:var(--red);}
+.money-flow-line{font-size:18px;font-weight:700;color:var(--white);display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;}
+.money-flow-line .arrow{font-size:20px;}
+.money-box.good .arrow{color:var(--green);}
+.money-box.bad .arrow{color:var(--red);}
+.money-detail{font-size:13px;color:var(--gray);margin-top:4px;}
+
+/* EXHIBIT */
+.exhibit{margin:20px 0;border-radius:8px;overflow:hidden;border:1px solid var(--gray-line);text-align:left;}
+.exhibit-label{padding:10px 14px;background:var(--dark3);font-family:var(--font-mono);font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--orange);}
+.exhibit img{width:100%;display:block;background:#fff;}
+.exhibit-caption{padding:10px 14px;font-size:13px;color:var(--gray);border-top:1px solid var(--gray-line);}
+
+/* CALLOUT */
+.callout{margin:20px 0;padding:18px;border-radius:8px;background:rgba(220,68,5,.06);border:1px solid rgba(220,68,5,.2);font-size:15px;color:#ccc;text-align:left;}
+.callout strong{color:var(--orange-glow);}
+
+/* READ AGAIN */
+.read-again{text-align:center;padding:32px 20px;font-family:var(--font-display);font-size:clamp(30px,6vw,46px);color:var(--orange);letter-spacing:2px;opacity:0;transform:scale(.9);transition:all .8s cubic-bezier(.25,.46,.45,.94);}
+.read-again.visible{opacity:1;transform:scale(1);}
+
+/* SECTION DIVIDER */
+.section-break{text-align:center;padding:36px 0;font-family:var(--font-mono);font-size:20px;letter-spacing:16px;color:var(--gray-line);}
+
+/* CLOSING */
+.closing{max-width:680px;margin:0 auto;padding:40px 20px 120px;}
+.closing h2{font-family:var(--font-display);font-size:clamp(36px,7vw,52px);color:var(--orange);letter-spacing:2px;margin-bottom:24px;}
+.closing p{color:#bbb;margin-bottom:16px;}
+.closing p strong{color:var(--white);}
+.closing .legal{margin-top:40px;padding:20px;border:1px dashed var(--gray-line);border-radius:8px;font-size:13px;color:var(--gray-dim);line-height:1.7;}
+.closing .prr{font-family:var(--font-mono);font-size:14px;color:var(--orange);margin-top:24px;text-align:center;letter-spacing:2px;}
+
+/* COUNTER */
+.record-counter{position:fixed;bottom:20px;right:20px;background:var(--dark2);border:1px solid var(--gray-line);border-radius:8px;padding:10px 16px;font-family:var(--font-mono);font-size:11px;color:var(--gray);z-index:100;opacity:0;transition:opacity .3s;pointer-events:none;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);}
+.record-counter.show{opacity:1;}
+.record-counter span{color:var(--orange);font-weight:500;}
+
+/* LIGHTBOX */
+.lightbox{display:none;position:fixed;inset:0;z-index:2000;background:rgba(0,0,0,.92);justify-content:center;align-items:center;padding:20px;cursor:zoom-out;backdrop-filter:blur(4px);}
+.lightbox.active{display:flex;}
+.lightbox img{max-width:100%;max-height:90vh;object-fit:contain;border-radius:4px;}
+.zoomable{cursor:zoom-in;transition:transform .2s;}
+.zoomable:hover{transform:scale(1.01);}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes bounce{0%,20%,50%,80%,100%{transform:rotate(45deg) translateY(0)}40%{transform:rotate(45deg) translateY(-6px)}60%{transform:rotate(45deg) translateY(-3px)}}
+@keyframes pulse{0%,100%{box-shadow:0 0 8px rgba(220,68,5,.6),0 0 20px rgba(220,68,5,.3)}50%{box-shadow:0 0 14px rgba(220,68,5,.8),0 0 30px rgba(220,68,5,.5)}}
+.t-entry.visible .t-dot{animation:pulse 2s ease-in-out infinite;}
+</style>
+</head>
+<body>
+
+<div class="progress-bar" id="progressBar"></div>
+
+<section class="hero">
+  <div class="hero-kicker">PRR 2025-396 · Nearly 1,400 Public Records</div>
+  <h1>THE BARNES<br><span>FILES</span></h1>
+  <p class="hero-sub">An interactive timeline of Oregon State's Blueprint deal, told entirely through public records obtained under ORS 192.</p>
+  <div class="hero-meta">JP Bertram · Belligerent Beavs · February 2026</div>
+  <div class="hero-scroll">Scroll to begin<div class="arrow"></div></div>
+</section>
+
+<section class="intro">
+  <p>On September 29, 2025, I submitted a public records request to Oregon State University. I asked for communications related to the university's partnership with Blueprint Sports and Entertainment, the acquisition of the Dam Nation Collective, and the departure of DNC General Manager Kyle Bjornstad.</p>
+  <p>OSU produced nearly 1,400 records across four batches: emails, SMS threads, internal documents, and the executed services agreement.</p>
+  <p class="read-all">I read all of them.</p>
+  <p style="margin-top:24px;">What follows is not editorial. These are the records, in sequence, with the context necessary to understand what they show. Every quote is sourced. Every document is from the production.</p>
+</section>
+
+<div class="section-break">· · ·</div>
+
+<section class="timeline" id="timeline">
+
+  <!-- 1: March 7 -->
+  <div class="t-entry minor">
+    <div class="t-dot"></div>
+    <div class="t-date">March 7, 2025</div>
+    <div class="t-title">THE COMPLIANCE FLAG</div>
+    <div class="t-body">Kyle Bjornstad emails OSU compliance officer Diana Ulrey requesting a targeted list of student-athletes by major, writing he was trying <strong>"to help BSP"</strong> (Beaver Sports Properties). <a class="record-link" href="https://drive.google.com/file/d/1Fi7jTQORpLn_r2yNBDqrjmIKArtSKtN0/view?usp=sharing" target="_blank" style="display:block;margin-top:8px;">View source document ↗</a></div>
+  </div>
+
+  <!-- 2: March 13 -->
+  <div class="t-entry minor">
+    <div class="t-dot"></div>
+    <div class="t-date">March 13, 2025</div>
+    <div class="t-title">THE NCAA CONCERN</div>
+    <div class="t-body">Diana Ulrey emails Scott Barnes flagging the issue directly:</div>
+    <div class="record">
+      <div class="record-head"><span class="record-tag">EMAIL</span><span>Diana Ulrey → Scott Barnes</span></div>
+      <div class="record-body">The <strong>NCAA concern is that, through his duties contracting with OSU, recruit names will be shared from coaches.</strong></div>
+      <a class="record-link" href="https://drive.google.com/file/d/1zXkbDQRSYvOhPeKcYgHG5weQevzyCTIN/view?usp=sharing" target="_blank" data-record="1">Batch 3 · View source document ↗</a>
+    </div>
+  </div>
+
+  <!-- 3: March 30 -->
+  <div class="t-entry">
+    <div class="t-dot"></div>
+    <div class="t-date">March 30, 2025</div>
+    <div class="t-title">THE SHUTDOWN NOTICE</div>
+    <div class="t-body">Kyle Bjornstad emails Scott Barnes and OSU leadership: he intends to shut down the Dam Nation Collective no later than July 1, 2025.</div>
+  </div>
+
+  <!-- 4: April 1 -->
+  <div class="t-entry minor">
+    <div class="t-dot"></div>
+    <div class="t-date">April 1, 2025</div>
+    <div class="t-title">PERSONAL SERVICES CONTRACT</div>
+    <div class="t-body">Kyle signs a Personal Services Contract with OSU. The contract does not include any title. No "General Manager." No named position. This becomes important later.</div>
+  </div>
+
+  <!-- 5: April 2 -->
+  <div class="t-entry">
+    <div class="t-dot"></div>
+    <div class="t-date">April 2, 2025</div>
+    <div class="t-title">FIRST CONTACT</div>
+    <div class="t-body">Three days after Kyle's shutdown notice, <strong>Brent Blaylock texts Rob Sine at Blueprint</strong>. Not Kyle. Not procurement. Not a competitive search. One text, to one company, from a man invoking a prior relationship.</div>
+    <div class="record">
+      <div class="record-head"><span class="record-tag">SMS</span><span>Brent Blaylock → Rob Sine (Blueprint)</span></div>
+      <div class="record-body">Rob, this is Brent Blaylock <strong>(formerly of Arizona, now at Oregon State)</strong>. It's been awhile since we last connected, I've been impressed watching Blueprint's growth since <strong>those early days</strong>.<br><br>We are exploring transitioning our collective to a different management and I wanted to see if that is something you guys would be interested in operating. If so, do you have some time to discuss?</div>
+      <a class="record-link" href="https://drive.google.com/file/d/1CTVQPrNnPSujfxURDzRAINN6-4MSpdRV/view?usp=sharing" target="_blank" data-record="2">Batch 4, p.19 · View source document ↗</a>
+    </div>
+    <div class="t-body">No evidence in the production indicates OSU contacted any other vendor.</div>
+  </div>
+
+  <!-- 6: April 3 -->
+  <div class="t-entry minor">
+    <div class="t-dot"></div>
+    <div class="t-date">April 3, 2025</div>
+    <div class="t-title">COMPLIANCE MEETS KYLE</div>
+    <div class="t-body">Diana Ulrey emails Brent Blaylock: Scott Barnes wants weekly meetings with Kyle. Ulrey is also trying to understand how Kyle wants to operate, and circulates House settlement talking points.</div>
+  </div>
+
+  <!-- 7: April 16 -->
+  <div class="t-entry minor">
+    <div class="t-dot"></div>
+    <div class="t-date">April 16, 2025</div>
+    <div class="t-title">FOURTEEN DAYS</div>
+    <div class="t-body">Blueprint delivers a recommendation deck to OSU. Two weeks from first text to formal pitch. No competing presentations.</div>
+  </div>
+
+  <!-- 8: April 22 -->
+  <div class="t-entry minor">
+    <div class="t-dot"></div>
+    <div class="t-date">April 22, 2025</div>
+    <div class="t-title">HOUSE IMPLEMENTATION</div>
+    <div class="t-body">Diana Ulrey emails Brent Blaylock about scheduling a meeting with Kyle to cover "the basics of the settlement" and "to ask a few questions so that I better understand how he is wanting to operate."</div>
+  </div>
+
+  <!-- 9: June 13 -->
+  <div class="t-entry minor">
+    <div class="t-dot"></div>
+    <div class="t-date">June 13, 2025</div>
+    <div class="t-title">SECOND THOUGHTS</div>
+    <div class="t-body">In the days before the Lockerverse proposal, Kyle informs both Barnes and Blaylock that his interactions with Blueprint have been <strong>"both underwhelming, and unprofessional"</strong> and that he has major concerns about moving forward with them.</div>
+  </div>
+
+  <!-- 10: June 14 (Lockerverse) -->
+  <div class="t-entry">
+    <div class="t-dot"></div>
+    <div class="t-date">June 14, 2025, 4:19 PM</div>
+    <div class="t-title">THE OFFER THEY BURIED</div>
+    <div class="t-body">Lockerverse emails Kyle a formal proposal to acquire DNC:</div>
+    <div class="record">
+      <div class="record-head"><span class="record-tag">EMAIL</span><span>Marcus Rance (Lockerverse) → Kyle Bjornstad</span></div>
+      <div class="record-body">Lockerverse is prepared to offer Oregon State a two-year guaranteed partnership valued at <strong>$288,000 per year</strong>, with the payments made to OSU within the first quarter of each contract year.<br><br>Revenue generated beyond $288,000 each year to be split <strong>75% to Oregon State</strong> and 25% to Lockerverse.</div>
+      <a class="record-link" href="https://drive.google.com/file/d/1J2Q7KQ33o24oSgeHVn7V00DsuQ0FYvkT/view?usp=sharing" target="_blank" data-record="3">Batch 3, p.6-8 · View source document ↗</a>
+    </div>
+  </div>
+
+  <!-- 11: June 14 (Kyle to Barnes) -->
+  <div class="t-entry minor">
+    <div class="t-dot"></div>
+    <div class="t-date">June 14, 2025</div>
+    <div class="t-title">THE FORWARD</div>
+    <div class="t-body">Kyle forwards the Lockerverse proposal to Barnes that evening. He also tells Barnes that Blueprint informed him they don't need Dam Nation to move forward with Oregon State and were willing to start a collective from scratch. Barnes gives Kyle 24 hours to negotiate a deal with Lockerverse.</div>
+  </div>
+
+  <!-- 12: June 15 -->
+  <div class="t-entry">
+    <div class="t-dot"></div>
+    <div class="t-date">June 15, 2025, 8:45 AM</div>
+    <div class="t-title">UNDER 18 HOURS</div>
+    <div class="t-body">Barnes responds. One line. No follow-up questions. No request for a presentation. No consultation with procurement.</div>
+    <div class="record">
+      <div class="record-head"><span class="record-tag">EMAIL</span><span>Scott Barnes → Kyle Bjornstad</span></div>
+      <div class="record-body">This doesn't come close to the deal we have. Not worth exploring at all for our perspective. We would like to move forward with Blue print with your blessing.</div>
+      <a class="record-link" href="https://drive.google.com/file/d/1J2Q7KQ33o24oSgeHVn7V00DsuQ0FYvkT/view?usp=sharing" target="_blank" data-record="4">Batch 3, p.1-2 · View source document ↗</a>
+    </div>
+    <div class="money-compare">
+      <div class="money-box good">
+        <div class="money-label">Lockerverse Offer</div>
+        <div class="money-flow-line">Lockerverse <span class="arrow">→</span> $288K/yr <span class="arrow">→</span> OSU</div>
+        <div class="money-detail">Plus 75% of revenue above $288K flows to OSU</div>
+      </div>
+      <div class="money-box bad">
+        <div class="money-label">Blueprint Contract (Executed)</div>
+        <div class="money-flow-line">OSU <span class="arrow">→</span> $280K-$287.5K/yr <span class="arrow">→</span> Blueprint</div>
+        <div class="money-detail">Plus Blueprint retains 75% of revenue above $750K target</div>
+      </div>
+    </div>
+    <div class="t-body"><strong>The money flows in opposite directions.</strong></div>
+    <div class="exhibit">
+      <div class="exhibit-label">BPSE-OSU Services Agreement, Page 4 (Fee Structure)</div>
+      <img class="zoomable" loading="lazy" src="images/bpse_contract_fee_structure.png" alt="BPSE Contract fee structure">
+      <div class="exhibit-caption">Annual Management Fee, Contract Administration Fee (1.25%), and Fundraising Bonus: BPSE retains 75% of Net Direct Revenue between $750K and $1.15M; 50% above $1.15M. <a class="record-link" href="https://drive.google.com/file/d/1oUsDKYu9DM8DccYBTRxfQZKTJUEUXbya/view?usp=sharing" target="_blank">Batch 1 · View full contract ↗</a></div>
+    </div>
+  </div>
+
+  <div class="read-again">READ THAT AGAIN.</div>
+
+  <!-- 13: June 16 (Barnes) -->
+  <div class="t-entry minor">
+    <div class="t-dot"></div>
+    <div class="t-date">June 16, 2025</div>
+    <div class="t-title">BARNES CONFIRMS RECEIPT</div>
+    <div class="t-body">Barnes texts Kyle confirming he received the email, and says he asked Brent Blaylock to call Kyle.</div>
+  </div>
+
+  <!-- 14: June 16 (Blaylock) -->
+  <div class="t-entry minor">
+    <div class="t-dot"></div>
+    <div class="t-date">June 16, 2025</div>
+    <div class="t-title">"FACILITATING A DEAL"</div>
+    <div class="t-body">Blaylock texts Kyle:</div>
+    <div class="record">
+      <div class="record-head"><span class="record-tag">SMS</span><span>Brent Blaylock → Kyle Bjornstad</span></div>
+      <div class="record-body">Ok. Scott and I are here to help with <strong>facilitating a deal getting done with Blueprint</strong> that works for you. 100% respect that it is your company and fully your decision...</div>
+      <a class="record-link" href="https://drive.google.com/file/d/1CTVQPrNnPSujfxURDzRAINN6-4MSpdRV/view?usp=sharing" target="_blank" data-record="5">Batch 4, p.14 · View source document ↗</a>
+    </div>
+  </div>
+
+  <!-- 15: June 17 (radio silence) -->
+  <div class="t-entry minor">
+    <div class="t-dot"></div>
+    <div class="t-date">June 17, 2025</div>
+    <div class="t-title">"RADIO SILENCE"</div>
+    <div class="t-body">An SMS from Blaylock references Kyle's attorney, a period of "radio silence" from Blueprint, and that Kyle and his attorney "were then contacted by another company to take over the collective."</div>
+  </div>
+
+  <!-- 16: June 17 (legitimate threat) -->
+  <div class="t-entry">
+    <div class="t-dot"></div>
+    <div class="t-date">June 17, 2025, 7:44 PM</div>
+    <div class="t-title">"A LEGITIMATE THREAT"</div>
+    <div class="t-body">Blaylock texts Blueprint's representatives directly:</div>
+    <div class="record">
+      <div class="record-head"><span class="record-tag">SMS</span><span>Brent Blaylock → [Blueprint representatives]</span></div>
+      <div class="record-body">I understand this is your business as well and your negotiation. So not here to spend your money, but there's some value for all involved on this not happening. And he clearly has a <strong>legitimate threat</strong>. That being said, if Kyle gets a little bit more out of the deal with Blueprint so that he feels better about all this, then so be it. We could potentially find some <strong>workarounds in our partnership with you to help you recoup</strong>.</div>
+      <a class="record-link" href="https://drive.google.com/file/d/1CTVQPrNnPSujfxURDzRAINN6-4MSpdRV/view?usp=sharing" target="_blank" data-record="6">Batch 4, p.14 · View source document ↗</a>
+    </div>
+  </div>
+
+  <!-- 17: June 17 (Barnes) -->
+  <div class="t-entry">
+    <div class="t-dot"></div>
+    <div class="t-date">June 17, 2025, 9:10 PM</div>
+    <div class="t-title">SAME DAY</div>
+    <div class="t-body">Ninety minutes later:</div>
+    <div class="record">
+      <div class="record-head"><span class="record-tag">SMS</span><span>Scott Barnes → Brent Blaylock</span></div>
+      <div class="record-body">We need to think about offering Kyle $ to keep what we have. Maybe meet him half way.</div>
+      <a class="record-link" href="https://drive.google.com/file/d/1CTVQPrNnPSujfxURDzRAINN6-4MSpdRV/view?usp=sharing" target="_blank" data-record="7">Batch 4, p.14 · View source document ↗</a>
+    </div>
+  </div>
+
+  <!-- 18: June 19 -->
+  <div class="t-entry">
+    <div class="t-dot"></div>
+    <div class="t-date">June 19, 2025</div>
+    <div class="t-title">"MULTIPLE ENTITIES"</div>
+    <div class="record">
+      <div class="record-head"><span class="record-tag">SMS</span><span>Brent Blaylock → [REDACTED]</span></div>
+      <div class="record-body">...he and I have discussed the significant concerns about the negative impact to all parties involved if there are <strong>multiple entities in the market</strong>. We are open to hearing what we can provide to get both sides back in agreement.</div>
+      <a class="record-link" href="https://drive.google.com/file/d/1CTVQPrNnPSujfxURDzRAINN6-4MSpdRV/view?usp=sharing" target="_blank" data-record="8">Batch 4, p.14 · View source document ↗</a>
+    </div>
+    <div class="callout"><strong>72 hours.</strong> A competing offer arrives. Barnes kills it in one line. Blaylock coaches Blueprint. Barnes discusses paying Kyle off. Blaylock warns of consequences. The contract was subsequently approved through a sole-source procurement exception.</div>
+    <div class="exhibit">
+      <div class="exhibit-label">OSU Sole-Source Procurement Approval (CPO Memo)</div>
+      <img class="zoomable" loading="lazy" src="images/sole_source_procurement_memo.png" alt="Sole source procurement memo">
+      <div class="exhibit-caption">OSU Standard 03-010, §5.2.1(g)(i), Item 6: Noncompetitive exception for "specific intercollegiate athletic activities." A ~$850K+ contract approved as sole-source while a competing offer sat on the AD's desk. <a class="record-link" href="https://drive.google.com/file/d/1_oIAejgz9n2ynjZilgyVxv0Yky63Gaa7/view?usp=sharing" target="_blank">Batch 1 · View CPO memo ↗</a></div>
+    </div>
+  </div>
+
+  <!-- 19: June 20 -->
+  <div class="t-entry minor">
+    <div class="t-dot"></div>
+    <div class="t-date">June 20, 2025</div>
+    <div class="t-title">HOUSE IMPLEMENTATION</div>
+    <div class="t-body">Internal "House implementation" agenda includes a line item: <strong>"Point for communication with Kyle."</strong></div>
+  </div>
+
+  <!-- 20: July 15 -->
+  <div class="t-entry">
+    <div class="t-dot"></div>
+    <div class="t-date">July 15, 2025</div>
+    <div class="t-title">THE ACQUISITION</div>
+    <div class="t-body">Dam Nation Collective is sold to Blueprint. An SMS from that day:</div>
+    <div class="record">
+      <div class="record-head"><span class="record-tag">SMS</span><span>[REDACTED] → Brent Blaylock</span></div>
+      <div class="record-body">All, Confidential... Just an FYI that the Dam Nation acquisition was finalized today. As we've discussed, please make sure to include me in the announcement/press release planning.</div>
+      <a class="record-link" href="https://drive.google.com/file/d/1CTVQPrNnPSujfxURDzRAINN6-4MSpdRV/view?usp=sharing" target="_blank" data-record="9">Batch 4, p.10 · View source document ↗</a>
+    </div>
+  </div>
+
+  <!-- 21: July 16 -->
+  <div class="t-entry minor">
+    <div class="t-dot"></div>
+    <div class="t-date">July 16, 2025</div>
+    <div class="t-title">SHORT CALLS WITH BLUEPRINT</div>
+    <div class="t-body">SMS records show coordination of "5-7 minute" calls with Blueprint and scheduling adjustments around them.</div>
+  </div>
+
+  <!-- 22: July 17 -->
+  <div class="t-entry minor">
+    <div class="t-dot"></div>
+    <div class="t-date">July 17, 2025</div>
+    <div class="t-title">AUTHORITY LIMBO</div>
+    <div class="t-body">Two days after the acquisition:</div>
+    <div class="record">
+      <div class="record-head"><span class="record-tag">SMS</span><span>[REDACTED] → Brent Blaylock</span></div>
+      <div class="record-body">I'm technically not allowed to answer on behalf of DNC anymore... So I'm hoping there isn't a huge lag in timing.</div>
+      <a class="record-link" href="https://drive.google.com/file/d/1CTVQPrNnPSujfxURDzRAINN6-4MSpdRV/view?usp=sharing" target="_blank" data-record="10">Batch 4, p.8 · View source document ↗</a>
+    </div>
+    <div class="t-body">A separate SMS: <strong>"Where are we with the blueprint agreement. We are ready to Announce."</strong></div>
+  </div>
+
+  <!-- 23: July 22 -->
+  <div class="t-entry minor">
+    <div class="t-dot"></div>
+    <div class="t-date">July 22, 2025</div>
+    <div class="t-title">FACILITIES AND RATES</div>
+    <div class="t-body">Brent Blaylock emails about facility use, treating Blueprint/Dam Nation as "associated" with OSU and discussing standard facility rates for NIL campaign use.</div>
+  </div>
+
+  <!-- 24: Aug 20 -->
+  <div class="t-entry">
+    <div class="t-dot"></div>
+    <div class="t-date">August 20, 2025</div>
+    <div class="t-title">THE PRESS RELEASE</div>
+    <div class="t-body">OSU, Blueprint, and Kyle issue a joint press release announcing the Blueprint partnership. <strong>Kyle is named General Manager.</strong> Barnes expressed excitement about retaining him. Remember this for later.</div>
+  </div>
+
+  <!-- 25: Sept 30 -->
+  <div class="t-entry">
+    <div class="t-dot"></div>
+    <div class="t-date">September 30, 2025</div>
+    <div class="t-title">SPORTICO PUBLISHES</div>
+    <div class="t-body">Sportico publishes the financial terms of the BPSE-OSU contract. The public sees the numbers for the first time.</div>
+  </div>
+
+  <!-- 26: Oct 1 -->
+  <div class="t-entry">
+    <div class="t-dot"></div>
+    <div class="t-date">October 1, 2025</div>
+    <div class="t-title">THE PRESSURE CALL</div>
+    <div class="t-body">The next day, Barnes calls Kyle. Here is what Kyle documented:</div>
+    <div class="record">
+      <div class="record-head"><span class="record-tag">EMAIL</span><span>Kyle Bjornstad → Scott Barnes · Oct 19</span></div>
+      <div class="record-body">...on that phone call, <strong>with other OSU employees present, including Brent, you presented the idea that I tell the media that nobody asked/pressured me to sell DNC, and nobody asked/pressured me to sell it to BPSE.</strong><br><br>...after our conversation on October 1, 2025, I knew that I could not continue to serve as General Manager while <strong>maintaining my integrity.</strong></div>
+      <a class="record-link" href="https://drive.google.com/file/d/1J2Q7KQ33o24oSgeHVn7V00DsuQ0FYvkT/view?usp=sharing" target="_blank" data-record="11">Batch 3, p.3-4 · View source document ↗</a>
+    </div>
+  </div>
+
+  <!-- 27: Oct 2 (Blaylock podcast) -->
+  <div class="t-entry">
+    <div class="t-dot"></div>
+    <div class="t-date">October 2, 2025</div>
+    <div class="t-title">"NO OPTION OTHER THAN BLUEPRINT"</div>
+    <div class="t-body">Brent Blaylock appears on the Dam Podcast:</div>
+    <div class="record">
+      <div class="record-head"><span class="record-tag">PUBLIC</span><span>Brent Blaylock → Dam Podcast</span></div>
+      <div class="record-body">"Once he [Kyle] sold Dam Nation to Blueprint, there was <strong>no option other than Blueprint.</strong>"</div>
+      <a class="record-link" href="https://drive.google.com/file/d/1J2Q7KQ33o24oSgeHVn7V00DsuQ0FYvkT/view?usp=sharing" target="_blank" data-record="12">Batch 3 · View source document ↗</a>
+    </div>
+  </div>
+
+  <!-- 28: Oct 2 (resignation) -->
+  <div class="t-entry">
+    <div class="t-dot"></div>
+    <div class="t-date">October 2, 2025</div>
+    <div class="t-title">KYLE RESIGNS</div>
+    <div class="t-body">Kyle Bjornstad submits his resignation as General Manager of Dam Nation Collective.</div>
+  </div>
+
+  <!-- 29: Oct 3 -->
+  <div class="t-entry">
+    <div class="t-dot"></div>
+    <div class="t-date">October 3, 2025</div>
+    <div class="t-title">"MULTIPLE ENTITIES"</div>
+    <div class="t-body">Brent Blaylock tells BeaversEdge:</div>
+    <div class="record">
+      <div class="record-head"><span class="record-tag">PUBLIC</span><span>Brent Blaylock → BeaversEdge</span></div>
+      <div class="record-body">"When [Kyle] decided to evaluate the options of transitioning ownership for that, <strong>I believe he talked to multiple entities on that. That was my impression at the time, that he had at least a couple he was reviewing.</strong>"</div>
+      <a class="record-link" href="https://drive.google.com/file/d/1J2Q7KQ33o24oSgeHVn7V00DsuQ0FYvkT/view?usp=sharing" target="_blank" data-record="13">Batch 3 · View source document ↗</a>
+    </div>
+    <div class="t-body">The records show Blaylock himself initiated the only vendor contact. Kyle found Lockerverse independently.</div>
+  </div>
+
+  <!-- 30: Oct 13 -->
+  <div class="t-entry">
+    <div class="t-dot"></div>
+    <div class="t-date">October 13, 2025</div>
+    <div class="t-title">THE PUBLIC NARRATIVE</div>
+    <div class="t-body">Barnes tells The Oregonian:</div>
+    <div class="record">
+      <div class="record-head"><span class="record-tag">PUBLIC</span><span>Scott Barnes → The Oregonian</span></div>
+      <div class="record-body">"...we have an outside entity that's taking control of the Dam Nation Collective that <strong>would have been left for dead.</strong>"</div>
+      <a class="record-link" href="https://drive.google.com/file/d/1J2Q7KQ33o24oSgeHVn7V00DsuQ0FYvkT/view?usp=sharing" target="_blank" data-record="14">Batch 3 · View source document ↗</a>
+    </div>
+    <div class="t-body">A $288,000/year guaranteed offer was sitting on his desk. He dismissed it in one line.</div>
+    <div class="record" style="margin-top:12px;">
+      <div class="record-head"><span class="record-tag">PUBLIC</span><span>Scott Barnes → The Oregonian</span></div>
+      <div class="record-body">"I think the General Manager position is a <strong>misnomer.</strong>"</div>
+      <a class="record-link" href="https://drive.google.com/file/d/1J2Q7KQ33o24oSgeHVn7V00DsuQ0FYvkT/view?usp=sharing" target="_blank" data-record="15">Batch 3 · View source document ↗</a>
+    </div>
+    <div class="t-body">The August 20 press release, which Barnes approved, named Kyle as General Manager.</div>
+  </div>
+
+  <!-- 31: Oct 14 -->
+  <div class="t-entry minor">
+    <div class="t-dot"></div>
+    <div class="t-date">October 14, 2025</div>
+    <div class="t-title">REPEATS ON DAM PODCAST</div>
+    <div class="t-body">Barnes repeats the "misnomer" claim on the Dam Podcast with Angie Machado.</div>
+  </div>
+
+  <!-- 32: Oct 19 -->
+  <div class="t-entry">
+    <div class="t-dot"></div>
+    <div class="t-date">October 19, 2025</div>
+    <div class="t-title">KYLE'S REBUTTAL</div>
+    <div class="t-body">Kyle sends the "Public Comments" email to Barnes. It includes this:</div>
+    <div class="record">
+      <div class="record-head"><span class="record-tag">EMAIL</span><span>Kyle Bjornstad → Scott Barnes</span></div>
+      <div class="record-body">I have been told, after the fact, that there was <strong>at least one other entity that discussed/pitched the idea of acquiring DNC with OSU officials, and that entity was never presented to me.</strong> Another major issue.</div>
+      <a class="record-link" href="https://drive.google.com/file/d/1J2Q7KQ33o24oSgeHVn7V00DsuQ0FYvkT/view?usp=sharing" target="_blank" data-record="16">Batch 3, p.2 · View source document ↗</a>
+    </div>
+    <div class="t-body"><strong>I have independently confirmed this.</strong> At least one other entity, a well-known name in the college sports infrastructure space, made a pitch to OSU leadership before the deal closed. An OSU official present had hoped it would be stronger so the university would have a viable alternative to Blueprint. It wasn't. Kyle was never told. The sole-source procurement was approved anyway.</div>
+    <div class="record" style="margin-top:16px;">
+      <div class="record-head"><span class="record-tag">EMAIL</span><span>Kyle Bjornstad → Scott Barnes</span></div>
+      <div class="record-body"><strong>It is clear that you and Brent are attempting to make me the scapegoat for the deal with BPSE, a deal that you wanted all along, and negotiated prior, during, and after the close of the DNC acquisition.</strong> I even negotiated a better deal with Lockerverse on your behalf, and presented the offer to you. Even so, you would not even explore a potential deal with Lockerverse.</div>
+      <a class="record-link" href="https://drive.google.com/file/d/1J2Q7KQ33o24oSgeHVn7V00DsuQ0FYvkT/view?usp=sharing" target="_blank" data-record="17">Batch 3, p.4 · View source document ↗</a>
+    </div>
+  </div>
+
+  <!-- 33: Oct 22 -->
+  <div class="t-entry">
+    <div class="t-dot"></div>
+    <div class="t-date">October 22, 2025, 7:13 AM</div>
+    <div class="t-title">THE PRIVILEGE PROBLEM</div>
+    <div class="record">
+      <div class="record-head"><span class="record-tag">EMAIL</span><span>Scott Barnes → Brent Blaylock</span></div>
+      <div class="record-body"><strong>Subject: Fwd: Public Comments Privileged and confidential</strong><br><br>This was sent to me by Kyle. I read it for the first time on Monday. Let's discuss.</div>
+      <a class="record-link" href="https://drive.google.com/file/d/1J2Q7KQ33o24oSgeHVn7V00DsuQ0FYvkT/view?usp=sharing" target="_blank" data-record="18">Batch 3, p.1 · View source document ↗</a>
+    </div>
+    <div class="t-body">The production shows a large redaction block after Barnes received Kyle's email, consistent with a forward to legal counsel (legitimately privileged). But then Barnes forwarded it again to Blaylock alone, without counsel on the thread. <strong>That communication is not privileged.</strong> It is an internal administrative communication subject to public records disclosure. Barnes stripped the privilege while keeping the label.</div>
+  </div>
+
+</section>
+
+
+<div style="max-width:680px;margin:0 auto 0;padding:20px;text-align:center;">
+  <div style="padding:20px;border:1px solid rgba(220,68,5,.25);border-radius:8px;background:rgba(220,68,5,.04);">
+    <div style="font-family:var(--font-mono);font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--orange);margin-bottom:8px;">Developing</div>
+    <div style="font-family:var(--font-body);font-size:15px;color:#bbb;line-height:1.6;">The next batch of records is scheduled for production on <strong style="color:var(--white);">March 6, 2026</strong>. This timeline will be updated as applicable.</div>
+  </div>
+</div>
+
+<!-- CLOSING -->
+<section class="closing">
+  <h2>WHAT THE RECORDS SHOW.</h2>
+  <p><strong>The records show</strong> that Blaylock initiated contact with Blueprint based on a prior personal relationship, three days after Kyle announced DNC's shutdown. No other vendors were contacted.</p>
+  <p><strong>The records show</strong> that when a financially superior competing offer arrived, one that would have paid OSU $288,000 per year instead of costing OSU $280,000+ per year, Barnes rejected it in under 18 hours without exploration.</p>
+  <p><strong>The records show</strong> that Blaylock then texted Blueprint to call the competing offer a "legitimate threat" and offered to find "workarounds" in the OSU-Blueprint partnership to help Blueprint "recoup."</p>
+  <p><strong>The records show</strong> that the contract was approved through a sole-source procurement exception.</p>
+  <p><strong>The records show</strong> that when the contract terms became public, Barnes called Kyle and, with other employees present, suggested Kyle tell media that no one pressured him. Kyle resigned the next day.</p>
+  <p><strong>The records show</strong> that at least one other entity pitched OSU about acquiring DNC. Kyle was never informed.</p>
+  <p><strong>The records show</strong> that Barnes forwarded Kyle's rebuttal email to Blaylock under a "Privileged and confidential" label that did not apply to the communication.</p>
+  <p>Every quote above comes from documents obtained under Oregon's public records law, ORS 192.</p>
+  <div class="prr">PRR 2025-396 · NEARLY 1,400 RECORDS · <a href="https://drive.google.com/drive/folders/1lXQplQPA_rWG-KGmBNzscRCppOECR01D?usp=sharing" id="driveLink" target="_blank" style="color:var(--orange);text-decoration:underline;">READ THEM YOURSELF</a></div>
+  <div class="legal"><strong>Sources:</strong> All documents obtained through Oregon Public Records Request PRR 2025-396, submitted September 29, 2025. Records produced by Oregon State University across four batches. The BPSE-OSU Services Agreement, sole-source procurement approval, and all correspondence quoted above are part of the production. Public statements sourced from The Oregonian (Oct 13, 2025), Dam Podcast (Oct 2, 2025), and BeaversEdge (Oct 3, 2025). Third buyer independently confirmed through sources with direct knowledge. No confidential sources identified.</div>
+</section>
+
+<div class="record-counter" id="counter">RECORD <span id="counterNum">0</span> / 33</div>
+
+<div class="lightbox" id="lightbox" onclick="this.classList.remove('active')"><img id="lightboxImg" src="" alt="Expanded view"></div>
+
+<script>
+const entries=document.querySelectorAll('.t-entry,.read-again');
+const counter=document.getElementById('counter');
+const counterNum=document.getElementById('counterNum');
+const progressBar=document.getElementById('progressBar');
+let lastVis=0;
+const obs=new IntersectionObserver(items=>{
+  items.forEach(i=>{if(i.isIntersecting)i.target.classList.add('visible')});
+  let v=0;entries.forEach(e=>{if(e.classList.contains('visible')&&e.classList.contains('t-entry'))v++});
+  if(v!==lastVis){lastVis=v;counterNum.textContent=v}
+},{threshold:.12,rootMargin:'0px 0px -40px 0px'});
+entries.forEach(e=>obs.observe(e));
+window.addEventListener('scroll',()=>{
+  const p=window.scrollY/(document.body.scrollHeight-window.innerHeight)*100;
+  progressBar.style.width=p+'%';
+  counter.classList.toggle('show',window.scrollY>400);
+});
+document.querySelectorAll('.zoomable').forEach(img=>{
+  img.addEventListener('click',()=>{
+    document.getElementById('lightboxImg').src=img.src;
+    document.getElementById('lightbox').classList.add('active');
+  });
+});
+/* Hide Squarespace's native blog post H1 so only our styled hero H1 shows */
+(function(){
+  document.querySelectorAll('h1').forEach(function(el){
+    if(!el.closest('.hero')) el.style.setProperty('display','none','important');
+  });
+})();
+/* Report height to parent iframe for auto-resize */
+(function(){
+  function reportHeight(){
+    var h = document.documentElement.scrollHeight;
+    if(window.parent !== window){
+      window.parent.postMessage({type:'resize',height:h},'*');
+    }
+  }
+  reportHeight();
+  window.addEventListener('load', reportHeight);
+  window.addEventListener('resize', reportHeight);
+  var ro = new ResizeObserver(reportHeight);
+  ro.observe(document.body);
+})();
+</script>
+</body>
+</html>
